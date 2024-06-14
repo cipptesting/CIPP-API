@@ -35,21 +35,10 @@ Function Invoke-AddSharedMailbox {
         Write-LogMessage -user $User -API $APINAME -tenant $($MailboxObject.tenantid) -message "Created shared mailbox $($MailboxObject.displayname) with email $Email" -Sev 'Info'
 
     } catch {
-        $ErrorMessage = Get-NormalizedError -Message $_.Exception.Message
-        Write-LogMessage -user $User -API $APINAME -tenant $($MailboxObject.tenantid) -message "Failed to create shared mailbox. Error: $ErrorMessage" -Sev 'Error'
-        $Body = $Results.add("Failed to create Shared Mailbox. $ErrorMessage")
+        $ErrorMessage = Get-NormalizedError -message $_.Exception.Message
+        Write-LogMessage -user $User -API $APINAME -tenant $($groupobj.tenantid) -message "Failed to create shared mailbox. Error: $ErrorMessage" -Sev 'Error'
+        $Body = $Results.add("Failed to create Shared Mailbox: $ErrorMessage")
 
-    }
-
-    # Block sign-in for the mailbox
-    try {
-        $null = Set-CIPPSignInState -userid $AddSharedRequest.ExternalDirectoryObjectId -TenantFilter $($MailboxObject.tenantid) -APIName $APINAME -ExecutingUser $User -AccountEnabled $false
-        Write-LogMessage -user $User -API $APINAME -tenant $($MailboxObject.tenantid) -message "Blocked sign-in for shared mailbox $Email" -Sev 'Info'
-        $Body = $Results.add("Blocked sign-in for shared mailbox $Email")
-    } catch {
-        $ErrorMessage = Get-NormalizedError -Message $_.Exception.Message
-        Write-LogMessage -user $User -API $APINAME -tenant $($MailboxObject.tenantid) -message "Failed to block sign-in for shared mailbox $Email. Error: $ErrorMessage" -Sev 'Error'
-        $Body = $Results.add("Failed to block sign-in for shared mailbox $Email. Error: $ErrorMessage")
     }
 
     # Add aliases to the mailbox if any are provided
@@ -69,6 +58,10 @@ Function Invoke-AddSharedMailbox {
             Write-LogMessage -user $User -API $APINAME -tenant $($MailboxObject.tenantid) -message "Failed to add aliases to $Email : $ErrorMessage" -Sev 'Error'
             $Body = $results.add("ERROR: Failed to add aliases to $Email : $ErrorMessage")
         }
+    } catch {
+        $ErrorMessage = Get-NormalizedError -message $_.Exception.Message
+        Write-LogMessage -user $User -API $APINAME -tenant $($groupobj.tenantid) -message "Failed to add aliases to $Email : $ErrorMessage" -Sev 'Error'
+        $Body = $results.add("ERROR: Failed to add aliases to $Email : $ErrorMessage")
     }
 
     $Body = [pscustomobject] @{ 'Results' = @($results) }
