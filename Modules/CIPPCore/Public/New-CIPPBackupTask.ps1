@@ -75,6 +75,22 @@ function New-CIPPBackupTask {
             }
         }
 
+        'antispam' {
+            Write-Host "Backup Anti-Spam Policies for $TenantFilter"
+
+            $Policies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            $Rules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json
+        }
+
+        'antiphishing' {
+            Write-Host "Backup Anti-Phishing Policies for $TenantFilter"
+
+            $Policies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            $Rules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json
+        }
+
         'CippWebhookAlerts' {
             Write-Host "Backup Webhook Alerts for $TenantFilter"
             $WebhookTable = Get-CIPPTable -TableName 'WebhookRules'

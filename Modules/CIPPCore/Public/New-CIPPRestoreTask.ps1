@@ -136,6 +136,239 @@ function New-CIPPRestoreTask {
 
         }
 
+        'antispam' {
+            $BackupConfig = $BackupData.antispam | ConvertFrom-Json
+            $BackupPolicies = $BackupConfig.policies
+            $BackupRules = $BackupConfig.rules
+            $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            $CurrentRules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
+
+            $ruleparams = @(
+                'Comments',
+                'ExceptIfRecipientDomainIs',
+                'ExceptIfSentTo',
+                'ExceptIfSentToMemberOf',
+                'HostedContentFilterPolicy',
+                'Name',
+                'Priority',
+                'RecipientDomainIs',
+                'SentTo',
+                'SentToMemberOf'
+            )
+
+            $policyparams = @(
+                'AddXHeaderValue',
+                'AdminDisplayName',
+                'AllowedSenderDomains',
+                'AllowedSenders',
+                'BlockedSenderDomains',
+                'BlockedSenders',
+                'BulkQuarantineTag',
+                'BulkSpamAction',
+                'BulkThreshold',
+                'DownloadLink',
+                'EnableEndUserSpamNotifications',
+                'EnableLanguageBlockList',
+                'EnableRegionBlockList',
+                'EndUserSpamNotificationCustomFromAddress',
+                'EndUserSpamNotificationCustomFromName',
+                'EndUserSpamNotificationCustomSubject',
+                'EndUserSpamNotificationFrequency',
+                'EndUserSpamNotificationLanguage',
+                'EndUserSpamNotificationLimit',
+                'HighConfidencePhishAction',
+                'HighConfidencePhishQuarantineTag',
+                'HighConfidenceSpamAction',
+                'HighConfidenceSpamQuarantineTag',
+                'IncreaseScoreWithBizOrInfoUrls',
+                'IncreaseScoreWithImageLinks',
+                'IncreaseScoreWithNumericIps',
+                'IncreaseScoreWithRedirectToOtherPort',
+                'InlineSafetyTipsEnabled',
+                'IntraOrgFilterState',
+                'LanguageBlockList',
+                'MarkAsSpamBulkMail',
+                'MarkAsSpamEmbedTagsInHtml',
+                'MarkAsSpamEmptyMessages',
+                'MarkAsSpamFormTagsInHtml',
+                'MarkAsSpamFramesInHtml',
+                'MarkAsSpamFromAddressAuthFail',
+                'MarkAsSpamJavaScriptInHtml',
+                'MarkAsSpamNdrBackscatter',
+                'MarkAsSpamObjectTagsInHtml',
+                'MarkAsSpamSensitiveWordList',
+                'MarkAsSpamSpfRecordHardFail',
+                'MarkAsSpamWebBugsInHtml',
+                'ModifySubjectValue',
+                'PhishQuarantineTag',
+                'PhishSpamAction',
+                'PhishZapEnabled',
+                'QuarantineRetentionPeriod',
+                'RedirectToRecipients',
+                'RegionBlockList',
+                'SpamAction',
+                'SpamQuarantineTag',
+                'SpamZapEnabled',
+                'TestModeAction',
+                'TestModeBccToRecipients'
+            )
+
+            foreach ($rule in $BackupRules) {
+                if ($rule.Identity -in $CurrentRules.Identity) {
+                    if ($overwrite) {
+                        $cmdparams = @{
+                            Identity = $rule.Identity
+                        }
+    
+                        foreach ($param in $ruleparams) {
+                            $cmdparams[$param] = $rule.$param
+                        }
+    
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterRule' -cmdparams $cmdparams -UseSystemMailbox $true
+                    }
+                } else {
+                    $cmdparams = @{}
+
+                    foreach ($param in $ruleparams) {
+                        $cmdparams[$param] = $rule.$param
+                    }
+
+                    New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterRule' -cmdparams $cmdparams -UseSystemMailbox $true
+                }
+            }
+
+            foreach ($policy in $BackupPolicies) {
+                if ($policy.Identity -in $CurrentPolicies.Identity) {
+                    if ($overwrite) {
+                        $cmdparams = @{
+                            Identity = $policies.Identity
+                        }
+    
+                        foreach ($param in $policyparams) {
+                            $cmdparams[$param] = $policy.$param
+                        }
+    
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                    }
+                } else {
+                    $cmdparams = @{}
+
+                    foreach ($param in $policyparams) {
+                        $cmdparams[$param] = $poliy.$param
+                    }
+
+                    New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                }
+            }
+        }
+
+        'antiphishing' {
+            $BackupConfig = $BackupData.antiphishing | ConvertFrom-Json
+            $BackupPolicies = $BackupConfig.policies
+            $BackupRules = $BackupConfig.rules
+            $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
+            $CurrentRules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
+
+            $ruleparams = @(
+                'Comments',
+                'AntiPhishPolicy',
+                'ExceptIfRecipientDomainIs',
+                'ExceptIfSentTo',
+                'ExceptIfSentToMemberOf',
+                'Name',
+                'Priority',
+                'RecipientDomainIs',
+                'SentTo',
+                'SentToMemberOf'
+            )
+
+            $policyparams = @(
+                'AdminDisplayName',
+                'AuthenticationFailAction',
+                'DmarcQuarantineAction',
+                'DmarcRejectAction',
+                'Enabled',
+                'EnableFirstContactSafetyTips',
+                'EnableMailboxIntelligence',
+                'EnableMailboxIntelligenceProtection',
+                'EnableOrganizationDomainsProtection',
+                'EnableSimilarDomainsSafetyTips',
+                'EnableSimilarUsersSafetyTips',
+                'EnableSpoofIntelligence',
+                'EnableTargetedDomainsProtection',
+                'EnableTargetedUserProtection',
+                'EnableUnauthenticatedSender',
+                'EnableUnusualCharactersSafetyTips',
+                'EnableViaTag',
+                'ExcludedDomains',
+                'ExcludedSenders',
+                'HonorDmarcPolicy',
+                'ImpersonationProtectionState',
+                'MailboxIntelligenceProtectionAction',
+                'MailboxIntelligenceProtectionActionRecipients',
+                'MailboxIntelligenceQuarantineTag',
+                'PhishThresholdLevel',
+                'PolicyTag',
+                'SpoofQuarantineTag',
+                'TargetedDomainActionRecipients',
+                'TargetedDomainProtectionAction',
+                'TargetedDomainQuarantineTag',
+                'TargetedDomainsToProtect',
+                'TargetedUserActionRecipients',
+                'TargetedUserProtectionAction',
+                'TargetedUserQuarantineTag',
+                'TargetedUsersToProtect'
+            )
+
+            foreach ($rule in $BackupRules) {
+                if ($rule.Identity -in $CurrentRules.Identity) {
+                    if ($overwrite) {
+                        $cmdparams = @{
+                            Identity = $rule.Identity
+                        }
+    
+                        foreach ($param in $ruleparams) {
+                            $cmdparams[$param] = $rule.$param
+                        }
+    
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
+                    }
+                } else {
+                    $cmdparams = @{}
+
+                    foreach ($param in $ruleparams) {
+                        $cmdparams[$param] = $rule.$param
+                    }
+
+                    New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
+                }
+            }
+
+            foreach ($policy in $BackupPolicies) {
+                if ($policy.Identity -in $CurrentPolicies.Identity) {
+                    if ($overwrite) {
+                        $cmdparams = @{
+                            Identity = $policies.Identity
+                        }
+    
+                        foreach ($param in $policyparams) {
+                            $cmdparams[$param] = $policy.$param
+                        }
+    
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                    }
+                } else {
+                    $cmdparams = @{}
+
+                    foreach ($param in $policyparams) {
+                        $cmdparams[$param] = $poliy.$param
+                    }
+
+                    New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                }
+            }
+        }
+
         'CippWebhookAlerts' {
             Write-Host "Restore Webhook Alerts for $TenantFilter"
             $WebhookTable = Get-CIPPTable -TableName 'WebhookRules'
