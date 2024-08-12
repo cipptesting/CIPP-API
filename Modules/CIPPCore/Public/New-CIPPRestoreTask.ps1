@@ -256,7 +256,7 @@ function New-CIPPRestoreTask {
                     }
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
+                    "Could not restore Anti-spam policy $($policy.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) "
                     Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam policy $($policy.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }
             }
@@ -305,7 +305,7 @@ function New-CIPPRestoreTask {
                     }
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-spam rule $($rule.Identity) : $($ErrorMessage.NormalizedError) "
+                    "Could not restore Anti-spam rule $($rule.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) "
                     Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam rule $($rule.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }   
             }
@@ -413,8 +413,8 @@ function New-CIPPRestoreTask {
                     }
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-phishing policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing policy $($policy.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                    "Could not restore Anti-phishing policy $($policy.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) "
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing policy $($policy.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }
             }
 
@@ -461,8 +461,8 @@ function New-CIPPRestoreTask {
                     }
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                    "Could not restore Anti-phishing rule $($rule.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) "
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing rule $($rule.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }
             }
         }
