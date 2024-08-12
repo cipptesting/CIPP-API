@@ -143,19 +143,6 @@ function New-CIPPRestoreTask {
             $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
             $CurrentRules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
 
-            $ruleparams = @(
-                'Comments',
-                'ExceptIfRecipientDomainIs',
-                'ExceptIfSentTo',
-                'ExceptIfSentToMemberOf',
-                'HostedContentFilterPolicy',
-                'Name',
-                'Priority',
-                'RecipientDomainIs',
-                'SentTo',
-                'SentToMemberOf'
-            )
-
             $policyparams = @(
                 'AddXHeaderValue',
                 'AdminDisplayName',
@@ -213,6 +200,52 @@ function New-CIPPRestoreTask {
                 'TestModeBccToRecipients'
             )
 
+            $ruleparams = @(
+                'Comments',
+                'ExceptIfRecipientDomainIs',
+                'ExceptIfSentTo',
+                'ExceptIfSentToMemberOf',
+                'HostedContentFilterPolicy',
+                'Name',
+                'Priority',
+                'RecipientDomainIs',
+                'SentTo',
+                'SentToMemberOf'
+            )
+
+            foreach ($policy in $BackupPolicies) {
+                try {
+                    if ($policy.Identity -in $CurrentPolicies.Identity) {
+                        if ($overwrite) {
+                            $cmdparams = @{
+                                Identity = $policies.Identity
+                            }
+        
+                            foreach ($param in $policyparams) {
+                                $cmdparams[$param] = $policy.$param
+                            }
+        
+                            New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                            
+                            Write-LogMessage -message "Restored $($policy.Identity)" -Sev 'info'
+                            "Restored $($policy.Identity) from backup."
+                        }
+                    } else {
+                        $cmdparams = @{}
+
+                        foreach ($param in $policyparams) {
+                            $cmdparams[$param] = $poliy.$param
+                        }
+
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
+                    }
+                } catch {
+                    $ErrorMessage = Get-CippException -Exception $_
+                    "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                }
+            }
+
             foreach ($rule in $BackupRules) {
                 try {
                     if ($rule.Identity -in $CurrentRules.Identity) {
@@ -248,39 +281,6 @@ function New-CIPPRestoreTask {
                     Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam rule $($rule.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }   
             }
-
-            foreach ($policy in $BackupPolicies) {
-                try {
-                    if ($policy.Identity -in $CurrentPolicies.Identity) {
-                        if ($overwrite) {
-                            $cmdparams = @{
-                                Identity = $policies.Identity
-                            }
-        
-                            foreach ($param in $policyparams) {
-                                $cmdparams[$param] = $policy.$param
-                            }
-        
-                            New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
-                            
-                            Write-LogMessage -message "Restored $($policy.Identity)" -Sev 'info'
-                            "Restored $($policy.Identity) from backup."
-                        }
-                    } else {
-                        $cmdparams = @{}
-
-                        foreach ($param in $policyparams) {
-                            $cmdparams[$param] = $poliy.$param
-                        }
-
-                        New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
-                    }
-                } catch {
-                    $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
-                }
-            }
         }
 
         'antiphishing' {
@@ -289,19 +289,6 @@ function New-CIPPRestoreTask {
             $BackupRules = $BackupConfig.rules
             $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
             $CurrentRules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
-
-            $ruleparams = @(
-                'Comments',
-                'AntiPhishPolicy',
-                'ExceptIfRecipientDomainIs',
-                'ExceptIfSentTo',
-                'ExceptIfSentToMemberOf',
-                'Name',
-                'Priority',
-                'RecipientDomainIs',
-                'SentTo',
-                'SentToMemberOf'
-            )
 
             $policyparams = @(
                 'AdminDisplayName',
@@ -341,41 +328,18 @@ function New-CIPPRestoreTask {
                 'TargetedUsersToProtect'
             )
 
-            foreach ($rule in $BackupRules) {
-                try {
-                    if ($rule.Identity -in $CurrentRules.Identity) {
-                        if ($overwrite) {
-                            $cmdparams = @{
-                                Identity = $rule.Identity
-                            }
-        
-                            foreach ($param in $ruleparams) {
-                                $cmdparams[$param] = $rule.$param
-                            }
-        
-                            New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
-
-                            Write-LogMessage -message "Restored $($rule.Identity)" -Sev 'info'
-                            "Restored $($rule.Identity) from backup."
-                        }
-                    } else {
-                        $cmdparams = @{}
-
-                        foreach ($param in $ruleparams) {
-                            $cmdparams[$param] = $rule.$param
-                        }
-
-                        New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
-
-                        Write-LogMessage -message "Restored $($rule.Identity)" -Sev 'info'
-                        "Restored $($rule.Identity) from backup."
-                    }
-                } catch {
-                    $ErrorMessage = Get-CippException -Exception $_
-                    "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
-                }
-            }
+            $ruleparams = @(
+                'Comments',
+                'AntiPhishPolicy',
+                'ExceptIfRecipientDomainIs',
+                'ExceptIfSentTo',
+                'ExceptIfSentToMemberOf',
+                'Name',
+                'Priority',
+                'RecipientDomainIs',
+                'SentTo',
+                'SentToMemberOf'
+            )
 
             foreach ($policy in $BackupPolicies) {
                 try {
@@ -410,6 +374,42 @@ function New-CIPPRestoreTask {
                     $ErrorMessage = Get-CippException -Exception $_
                     "Could not restore Anti-phishing policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
                     Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing policy $($policy.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                }
+            }
+
+            foreach ($rule in $BackupRules) {
+                try {
+                    if ($rule.Identity -in $CurrentRules.Identity) {
+                        if ($overwrite) {
+                            $cmdparams = @{
+                                Identity = $rule.Identity
+                            }
+        
+                            foreach ($param in $ruleparams) {
+                                $cmdparams[$param] = $rule.$param
+                            }
+        
+                            New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
+
+                            Write-LogMessage -message "Restored $($rule.Identity)" -Sev 'info'
+                            "Restored $($rule.Identity) from backup."
+                        }
+                    } else {
+                        $cmdparams = @{}
+
+                        foreach ($param in $ruleparams) {
+                            $cmdparams[$param] = $rule.$param
+                        }
+
+                        New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
+
+                        Write-LogMessage -message "Restored $($rule.Identity)" -Sev 'info'
+                        "Restored $($rule.Identity) from backup."
+                    }
+                } catch {
+                    $ErrorMessage = Get-CippException -Exception $_
+                    "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) "
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-phishing rule $($rule.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }
             }
         }
