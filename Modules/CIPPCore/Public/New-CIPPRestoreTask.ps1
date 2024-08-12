@@ -235,7 +235,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $policyparams) {
-                            $cmdparams[$param] = $poliy.$param
+                            $cmdparams[$param] = $policy.$param
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -364,7 +364,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $policyparams) {
-                            $cmdparams[$param] = $poliy.$param
+                            $cmdparams[$param] = $policy.$param
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
