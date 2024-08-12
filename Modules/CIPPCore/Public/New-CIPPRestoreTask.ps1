@@ -137,7 +137,7 @@ function New-CIPPRestoreTask {
         }
 
         'antispam' {
-            $BackupConfig = $BackupData.antispam | ConvertFrom-Json
+            $BackupConfig = $BackupData.antispam | ConvertFrom-Json | ConvertFrom-Json
             $BackupPolicies = $BackupConfig.policies
             $BackupRules = $BackupConfig.rules
             $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
@@ -284,7 +284,7 @@ function New-CIPPRestoreTask {
         }
 
         'antiphishing' {
-            $BackupConfig = $BackupData.antiphishing | ConvertFrom-Json
+            $BackupConfig = $BackupData.antiphishing | ConvertFrom-Json | ConvertFrom-Json
             $BackupPolicies = $BackupConfig.policies
             $BackupRules = $BackupConfig.rules
             $CurrentPolicies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
