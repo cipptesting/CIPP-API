@@ -257,7 +257,7 @@ function New-CIPPRestoreTask {
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
                     "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam policy $($policy.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam policy $($policy.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }
             }
 
@@ -296,7 +296,7 @@ function New-CIPPRestoreTask {
                                 }
                             }
                         }
-                        
+
     
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterRule' -cmdparams $cmdparams -UseSystemMailbox $true
 
@@ -306,7 +306,7 @@ function New-CIPPRestoreTask {
                 } catch {
                     $ErrorMessage = Get-CippException -Exception $_
                     "Could not restore Anti-spam rule $($rule.Identity) : $($ErrorMessage.NormalizedError) "
-                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam rule $($rule.Identity) : $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
+                    Write-LogMessage -user $ExecutingUser -API $APINAME -message "Could not restore Anti-spam rule $($rule.Identity) - $($cmdparams): $($ErrorMessage.NormalizedError) " -Sev 'Error' -LogData $ErrorMessage
                 }   
             }
         }
@@ -379,7 +379,13 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $policyparams) {
-                                if ($policy.$param) { $cmdparams[$param] = $policy.$param }
+                                if ($policy.$param) { 
+                                    $cmdparams[$param] = if ($param -in @('ExcludedDomains','ExcludedSenders','MailboxIntelligenceProtectionActionRecipients','TargetedDomainActionRecipients','TargetedDomainsToProtect','TargetedUserActionRecipients','TargetedUsersToProtect')) {
+                                        ($policy.$param -replace ' ',',')
+                                    } else {
+                                        $policy.$param
+                                    }
+                                }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -391,7 +397,13 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $policyparams) {
-                            if ($policy.$param) { $cmdparams[$param] = $policy.$param }
+                            if ($policy.$param) { 
+                                $cmdparams[$param] = if ($param -in @('ExcludedDomains','ExcludedSenders','MailboxIntelligenceProtectionActionRecipients','TargetedDomainActionRecipients','TargetedDomainsToProtect','TargetedUserActionRecipients','TargetedUsersToProtect')) {
+                                    ($policy.$param -replace ' ',',')
+                                } else {
+                                    $policy.$param
+                                }
+                            }
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -415,7 +427,13 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $ruleparams) {
-                                if ($rule.$param) { $cmdparams[$param] = $rule.$param }
+                                if ($rule.$param) { 
+                                    $cmdparams[$param] = if ($rule.$param -in @('ExceptIfRecipientDomainIs','ExceptIfSentTo','ExceptIfSentToMemberOf','RecipientDomainIs','SentTo','SentToMemberOf')) {
+                                        ($rule.$param -replace ' ',',')
+                                    } else {
+                                        $rule.$param 
+                                    }
+                                }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -427,7 +445,13 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $ruleparams) {
-                            if ($rule.$param) { $cmdparams[$param] = $rule.$param }
+                            if ($rule.$param) { 
+                                $cmdparams[$param] = if ($rule.$param -in @('ExceptIfRecipientDomainIs','ExceptIfSentTo','ExceptIfSentToMemberOf','RecipientDomainIs','SentTo','SentToMemberOf')) {
+                                    ($rule.$param -replace ' ',',')
+                                } else {
+                                    $rule.$param 
+                                }
+                            }
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
