@@ -196,9 +196,7 @@ function New-CIPPRestoreTask {
                 'RegionBlockList',
                 'SpamAction',
                 'SpamQuarantineTag',
-                'SpamZapEnabled',
-                'TestModeAction',
-                'TestModeBccToRecipients'
+                'SpamZapEnabled'
             )
 
             $ruleparams = @(
