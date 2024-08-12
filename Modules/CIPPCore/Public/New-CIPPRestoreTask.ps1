@@ -221,7 +221,7 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $policyparams) {
-                                $cmdparams[$param] = $policy.$param
+                                if ($policy.$param) { $cmdparams[$param] = $policy.$param }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -233,7 +233,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $policyparams) {
-                            $cmdparams[$param] = $policy.$param
+                            if ($policy.$param) { $cmdparams[$param] = $policy.$param }
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -254,7 +254,7 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $ruleparams) {
-                                $cmdparams[$param] = $rule.$param
+                                if ($rule.$param) { $cmdparams[$param] = $rule.$param }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterRule' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -266,7 +266,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
     
                         foreach ($param in $ruleparams) {
-                            $cmdparams[$param] = $rule.$param
+                            if ($rule.$param) { $cmdparams[$param] = $rule.$param }
                         }
     
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-HostedContentFilterRule' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -350,7 +350,7 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $policyparams) {
-                                $cmdparams[$param] = $policy.$param
+                                if ($policy.$param) { $cmdparams[$param] = $policy.$param }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -362,7 +362,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $policyparams) {
-                            $cmdparams[$param] = $policy.$param
+                            if ($policy.$param) { $cmdparams[$param] = $policy.$param }
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -386,7 +386,7 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $ruleparams) {
-                                $cmdparams[$param] = $rule.$param
+                                if ($rule.$param) { $cmdparams[$param] = $rule.$param }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
@@ -398,7 +398,7 @@ function New-CIPPRestoreTask {
                         $cmdparams = @{}
 
                         foreach ($param in $ruleparams) {
-                            $cmdparams[$param] = $rule.$param
+                            if ($rule.$param) { $cmdparams[$param] = $rule.$param }
                         }
 
                         New-ExoRequest -TenantId $Tenant -cmdlet 'New-AntiPhishRule' -cmdparams $cmdparams -UseSystemMailbox $true
