@@ -221,7 +221,13 @@ function New-CIPPRestoreTask {
                             }
         
                             foreach ($param in $policyparams) {
-                                if ($policy.$param) { $cmdparams[$param] = $policy.$param }
+                                if ($policy.$param) {
+                                    $cmdparams[$param] = if ($param -eq 'IntraOrgFilterState' -and $policy.$param -eq 'Default') {
+                                        'HighConfidencePhish'
+                                    } else {
+                                        $policy.$param
+                                    }
+                                }
                             }
         
                             New-ExoRequest -TenantId $Tenant -cmdlet 'Set-HostedContentFilterPolicy' -cmdparams $cmdparams -UseSystemMailbox $true
