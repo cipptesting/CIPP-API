@@ -225,7 +225,7 @@ function New-CIPPRestoreTask {
                                     $cmdparams[$param] = if ($param -eq 'IntraOrgFilterState' -and $policy.$param -eq 'Default') {
                                         'HighConfidencePhish'
                                     } elseif ($param -in @('AllowedSenderDomains','AllowedSenders','BlockedSenderDomains','BlockedSenders','LanguageBlockList','RegionBlockList','RedirectToRecipients')) {
-                                        ($policy.$param -replace ' ',',')
+                                        '"' + ($policy.$param -replace ' ', '","') + '"'
                                     } else {
                                         $policy.$param
                                     }
@@ -245,7 +245,7 @@ function New-CIPPRestoreTask {
                                 $cmdparams[$param] = if ($param -eq 'IntraOrgFilterState' -and $policy.$param -eq 'Default') {
                                     'HighConfidencePhish'
                                 } elseif ($param -in @('AllowedSenderDomains','AllowedSenders','BlockedSenderDomains','BlockedSenders','LanguageBlockList','RegionBlockList','RedirectToRecipients')) {
-                                    ($policy.$param -replace ' ',',')
+                                    '"' + ($policy.$param -replace ' ', '","') + '"'
                                 } else {
                                     $policy.$param
                                 }
@@ -272,7 +272,7 @@ function New-CIPPRestoreTask {
                             foreach ($param in $ruleparams) {
                                 if ($rule.$param) { 
                                     $cmdparams[$param] = if ($param -in @('ExceptIfRecipientDomainIs','ExceptIfSentTo','ExceptIfSentToMemberOf','RecipientDomainIs','SentTo','SentToMemberOf')) {
-                                        ($rule.$param -replace ' ',',')
+                                        '"' + ($policy.$param -replace ' ', '","') + '"'
                                     } else {
                                         $rule.$param 
                                     }
@@ -290,7 +290,7 @@ function New-CIPPRestoreTask {
                         foreach ($param in $ruleparams) {
                             if ($rule.$param) { 
                                 $cmdparams[$param] = if ($param -in @('ExceptIfRecipientDomainIs','ExceptIfSentTo','ExceptIfSentToMemberOf','RecipientDomainIs','SentTo','SentToMemberOf')) {
-                                    ($rule.$param -replace ' ',',')
+                                    '"' + ($policy.$param -replace ' ', '","') + '"'
                                 } else {
                                     $rule.$param 
                                 }
@@ -381,7 +381,7 @@ function New-CIPPRestoreTask {
                             foreach ($param in $policyparams) {
                                 if ($policy.$param) { 
                                     $cmdparams[$param] = if ($param -in @('ExcludedDomains','ExcludedSenders','MailboxIntelligenceProtectionActionRecipients','TargetedDomainActionRecipients','TargetedDomainsToProtect','TargetedUserActionRecipients','TargetedUsersToProtect')) {
-                                        ($policy.$param -replace ' ',',')
+                                        '"' + ($policy.$param -replace ' ', '","') + '"'
                                     } else {
                                         $policy.$param
                                     }
@@ -399,7 +399,7 @@ function New-CIPPRestoreTask {
                         foreach ($param in $policyparams) {
                             if ($policy.$param) { 
                                 $cmdparams[$param] = if ($param -in @('ExcludedDomains','ExcludedSenders','MailboxIntelligenceProtectionActionRecipients','TargetedDomainActionRecipients','TargetedDomainsToProtect','TargetedUserActionRecipients','TargetedUsersToProtect')) {
-                                    ($policy.$param -replace ' ',',')
+                                    '"' + ($policy.$param -replace ' ', '","') + '"'
                                 } else {
                                     $policy.$param
                                 }
