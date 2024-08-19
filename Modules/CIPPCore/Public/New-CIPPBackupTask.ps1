@@ -80,7 +80,7 @@ function New-CIPPBackupTask {
 
             $Policies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
             $Rules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-HostedContentFilterRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
-            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json
+            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json -Depth 10
         }
 
         'antiphishing' {
@@ -88,7 +88,7 @@ function New-CIPPBackupTask {
 
             $Policies = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishPolicy' | Select-Object * -ExcludeProperty *odata*, *data.type*
             $Rules = New-ExoRequest -tenantid $Tenantfilter -cmdlet 'Get-AntiPhishRule' | Select-Object * -ExcludeProperty *odata*, *data.type*
-            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json
+            @{ policies = $Policies; rules = $Rules } | ConvertTo-Json -Depth 10
         }
 
         'CippWebhookAlerts' {
